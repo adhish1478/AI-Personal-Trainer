@@ -102,7 +102,7 @@ class UserProfile(models.Model):
             bmr= 10 * weight + 6.25 * height - 5 * age + 5
 
         activity_factor= self.get_activity_factor()
-        return(bmr*activity_factor)
+        return int(bmr*activity_factor)
     
     def save(self, *args, **kwargs):
         self.maintanance_cals= self.calculate_maintanance_calories()
