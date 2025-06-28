@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .models import CustomUser, UserProfile
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.generics import RetrieveUpdateAPIView
 from .serializers import CustomUserSerializer, UserProfileSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -38,7 +38,9 @@ class CustomUserViewSet(APIView):
     
     
 
-class UserProfileViewSet(ModelViewSet):
-    queryset = UserProfile.objects.all()
+class UserProfileViewSet(RetrieveUpdateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = UserProfileSerializer
 
+    def get_object(self):
+        return UserProfile.objects.get(user=self.request.user)
