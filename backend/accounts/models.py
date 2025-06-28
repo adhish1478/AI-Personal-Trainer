@@ -51,8 +51,8 @@ class UserProfile(models.Model):
     age= models.PositiveIntegerField(null=True, blank=True)
     gender= gender = models.CharField(max_length=10, choices=GENDER_CHOICES, blank=True, null=True)
 
-    height= models.FloatField() # in cm
-    weight= models.FloatField() # in kg
+    height= models.FloatField(null=True, blank=True) # in cm
+    weight= models.FloatField(null=True, blank=True) # in kg
     activity_level= models.CharField(max_length=20, choices=ACTIVITY_LEVEL_CHOICES, default='sedentary')
     maintanance_cals= models.IntegerField(null= True)
     goal_cals= models.IntegerField(null=True)
@@ -76,12 +76,12 @@ class UserProfile(models.Model):
 
     def get_activity_factor(self):
         level_map= {
-            'sedentary': 1.2,
-            'lightly_active': 1.375,
-            'moderate': 1.55,
-            'active': 1.725,
-            'very_active': 1.9
-        }
+        'sedentary': 1.2,
+        'lightly_active': 1.375,
+        'moderately_active': 1.55,
+        'very_active': 1.725,
+        'extra_active': 1.9
+    }
         return level_map.get(self.activity_level, 1.2) # Default to sedentary if not found
 
     def calculate_maintanance_calories(self):
@@ -102,7 +102,7 @@ class UserProfile(models.Model):
             bmr= 10 * weight + 6.25 * height - 5 * age + 5
 
         activity_factor= self.get_activity_factor()
-        return int(bmr*activity_factor)
+        return round(bmr*activity_factor)
     
     def save(self, *args, **kwargs):
         self.maintanance_cals= self.calculate_maintanance_calories()
