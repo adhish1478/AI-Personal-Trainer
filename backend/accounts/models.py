@@ -74,10 +74,10 @@ class UserProfile(models.Model):
     goal_cals= models.IntegerField(null=True)
 
     # Macronutrient targets
-    carbs= models.FloatField(null=True)
-    protein= models.FloatField(null=True)
-    fats= models.FloatField(null=True)
-    fibre= models.FloatField(null=True)
+    carbs= models.IntegerField(null=True)
+    protein= models.IntegerField(null=True)
+    fats= models.IntegerField(null=True)
+    fibre= models.IntegerField(null=True)
 
     # Dietary preferences
     allergies= models.JSONField(default=list, blank=True)
@@ -151,8 +151,9 @@ class UserProfile(models.Model):
         Calculates macronutrient targets based on goal calories.
         Returns a dictionary with carb, protein, fat, and fibre targets.
         """
-        if not self.goal_cals:
-            self.goal_cals= self.calculate_goal_calories()
+
+        if not self.weight or not self.goal_cals:
+            return None # Incomplete data
 
         weight= self.weight
         goal= self.goal
@@ -199,7 +200,7 @@ class UserProfile(models.Model):
             self.fibre = 25 if self.goal_cals < 2200 else 28
         else:
             self.fibre = 30 if self.goal_cals < 2500 else 35
-            
+
 
     def save(self, *args, **kwargs):
         self.maintanance_cals= self.calculate_maintanance_calories()

@@ -6,6 +6,9 @@ from .serializers import CustomUserSerializer, UserProfileSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth import get_user_model
+
+from .tasks import send_welcome_email, get_email_token
+from django.db import transaction
 # Create your views here.
 
 
@@ -23,11 +26,15 @@ class CustomUserViewSet(APIView):
         serializer= CustomUserSerializer(data=data)
         if serializer.is_valid():
             user= serializer.save()
+            # Email verification and token generation can be handled here
+            token= get_email_token(user)
+            transaction.on_commit(lambda: send_welcome_email.delay(user.id, token))
             return Response({
-                "message": "User created successfully.",
+                "message": "User created successfully and verification mail sent.",
                 "user": user.email
             }, status=201)
         return Response(serializer.errors, status=400)
+    
     
     
 
