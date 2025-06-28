@@ -21,7 +21,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model= UserProfile
         fields= ['id', 'first_name', 'last_name', 'full_name', 'age', 'gender', 'height',
             'weight', 'activity_level', 'maintanance_cals', 'goal_cals',
-            'carb', 'protein', 'fat', 'fibre', 'allergies', 'cuisine',
+            'goal','lifts_weight', 'carbs', 'protein', 'fats', 'fibre', 'allergies', 'cuisine',
             'created_at', 'updated_at']
         read_only_fields= ['id', 'maintanance_cals', 'created_at', 'updated_at']
 
@@ -39,13 +39,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         profile= UserProfile.objects.create(**validated_data)
-        profile.maintanance_cals= profile.calculate_maintanance_calories()
-        profile.save()
         return profile
     
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-        instance.maintanance_cals= instance.calculate_maintanance_calories()
         instance.save()
         return instance
