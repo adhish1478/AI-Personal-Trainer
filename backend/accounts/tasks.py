@@ -11,7 +11,7 @@ def send_welcome_email(user_id, token):
     subject= 'Welcome to AI Personal Trainer'
     verification_url = f"http://localhost:8000/api/verify-email/?token={token}"
     message= f"Hello {user.email},\n\nThank you for registering with AI Personal Trainer. Please verify your email address by clicking the link below:\n\n{verification_url}"
-    from_email= settings.EMAIL_HOST_USER
+    from_email= settings.DEFAULT_FROM_EMAIL
     recipients_list= [user.email]
 
     send_mail(subject, message, from_email, recipients_list)
