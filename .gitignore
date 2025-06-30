@@ -105,7 +105,6 @@ venv/
 ENV/ 
 env.bak/ 
 venv.bak/ 
-.DS_Store
 
 # mkdocs documentation 
 /site 
@@ -136,5 +135,5 @@ GitHub.sublime-settings
 !.vscode/tasks.json 
 !.vscode/launch.json 
 !.vscode/extensions.json 
-.history
-
+.history.DS_Store
+backend/.DS_Store
