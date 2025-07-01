@@ -38,6 +38,7 @@ ALLOWED_HOSTS = []
 SITE_ID = 1  # Default site ID for Django sites framework
 
 INSTALLED_APPS = [
+    'daphne',  # Daphne for ASGI server
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -54,6 +55,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',  # Django Allauth social account management
     'allauth.socialaccount.providers.google',  # Google provider for Allauth
     'corsheaders',  # CORS headers for cross-origin requests
+    'channels',  # Django Channels for WebSocket support
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -78,6 +80,9 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ]
 }
+
+# ASGI SETTINGS
+ASGI_APPLICATION = 'backend.asgi.application'
 
 #JWT Authentication settings
 SIMPLE_JWT = {
