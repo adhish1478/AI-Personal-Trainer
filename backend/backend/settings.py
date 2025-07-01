@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',  # Google provider for Allauth
     'corsheaders',  # CORS headers for cross-origin requests
     'channels',  # Django Channels for WebSocket support
+    'chat',  # APP for chat functionality
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
