@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',  # Google provider for Allauth
     'corsheaders',  # CORS headers for cross-origin requests
     'channels',  # Django Channels for WebSocket support
+    'chat',  # APP for chat functionality
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -212,3 +213,7 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_LOGIN_METHODS = {'email'}
+
+
+# Gemini API settings
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'your-gemini-api-key')
