@@ -4,6 +4,10 @@ from accounts.models import UserProfile
 from asgiref.sync import sync_to_async
 from channels.db import database_sync_to_async
 from .models import ChatMessage
+# Gemini libraries
+from google import genai
+from django.conf import settings
+import re
 
 PREDEFINED_QUESTIONS = [
     "What's your fitness goal?",
@@ -15,6 +19,7 @@ class ChatBot(AsyncWebsocketConsumer):
     async def connect(self):
         self.question_index = 0
         self.answers= []
+        self.last_llm_response = None
 
         await self.accept()
         # Send a welcome message when the socket connects
@@ -34,10 +39,26 @@ class ChatBot(AsyncWebsocketConsumer):
             }))
             return
         # ---------------------------------------------------
+
         data = json.loads(text_data)
         message = data.get('message')
 
-    
+        # checking wheather last message is confirmation or not
+        if message.lower() == 'confirm':
+            if self.last_llm_response:
+                await self.generate_structured_plan(self.last_llm_response)
+            else:
+                self.send_error("No previous response to confirm.")
+            return
+
+        # checking if the user wants to regenerate the plan
+        if message.lower() == 'regenerate':
+            if self.last_llm_response:
+                await self.regenrate_new_plan(self.last_llm_response)
+            else:
+                self.send_error("No previous response to regenerate.")
+            return
+        
         # Store the answer
         if message:
             self.answers.append(message)
@@ -94,9 +115,6 @@ class ChatBot(AsyncWebsocketConsumer):
             """
 
             # LLm logic here
-            from google import genai
-            from django.conf import settings
-            import re
             
             client = genai.Client(
                 api_key=settings.GEMINI_API_KEY
@@ -110,15 +128,55 @@ class ChatBot(AsyncWebsocketConsumer):
                 if response.candidates and response.candidates[0].content.parts
                 else "No response from AI."
             )
-        
+            self.last_llm_response = text
             # Send the AI response back to the client
             await self.send(text_data=json.dumps({
             "message": text,
             "from_llm": True
              }))
 
-            
+    async def generate_structured_plan(self, raw_plain_text):
+        # Process the raw plan text to generate a structured response
+        structured_prompt = f"""
+        Convert the following fitness plan into structured JSON:
+        Return only JSON. No markdown or commentary.
 
+        Plan:
+        {raw_plain_text}
+        """
+
+        client = genai.Client(
+            api_key=settings.GEMINI_API_KEY
+        )
+        response = client.models.generate_content(
+            model="gemini-2.5-flash", contents=structured_prompt,
+        )
+
+        text = response.candidates[0].content.parts[0].text if response.candidates and response.candidates[0].content.parts else "No response from AI."
+
+        # Converting Markdown to JSON
+        try:
+            cleaned = re.sub(r'^```json\s*|\s*```$', '', text.strip(), flags=re.MULTILINE)
+            structured_data= json.loads(cleaned)
+        except Exception as e:
+            await self.send_error(f"AI did not return valid JSON. Error: {e}")
+            return
+        
+        # Saving the diet plan to the database
+        await sync_to_async(DietPlan.objects.create) (
+            user= self.scope['user'],
+            breakfast=structured_data.get("breakfast"),
+            lunch=structured_data.get("lunch"),
+            dinner=structured_data.get("dinner"),
+            snacks=structured_data.get("snacks"),
+            notes=structured_data.get("notes", ""),
+        )
+
+        await self.send(text_data= json.dumps({
+            "message": "✅ Diet plan saved successfully!",
+            "from_llm": False
+        }))
+    
     async def send_question(self):
         if self.question_index < len(PREDEFINED_QUESTIONS):
             question = PREDEFINED_QUESTIONS[self.question_index]
