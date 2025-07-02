@@ -3,6 +3,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from accounts.models import UserProfile
 from asgiref.sync import sync_to_async
 from channels.db import database_sync_to_async
+from .models import ChatMessage
 
 PREDEFINED_QUESTIONS = [
     "What's your fitness goal?",
@@ -40,6 +41,15 @@ class ChatBot(AsyncWebsocketConsumer):
         # Store the answer
         if message:
             self.answers.append(message)
+
+            # Save the chat message to the database
+            await sync_to_async(ChatMessage.objects.create)(
+                user= user,
+                is_from_user= True,
+                message= message,
+            )
+
+
         if self.question_index < len(PREDEFINED_QUESTIONS):
             await self.send_question()
         else:
