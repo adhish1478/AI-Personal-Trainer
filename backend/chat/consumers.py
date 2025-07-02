@@ -177,6 +177,34 @@ class ChatBot(AsyncWebsocketConsumer):
             "from_llm": False
         }))
     
+    async def regenrate_new_plan(self, previous_text):
+        # Regenerate a new plan based on the previous response
+        prompt = f"""
+        Using the following previous plan, create a different meal plan
+        with similar calorie/macronutrient structure but **no repetition** in dishes.
+
+        Previous Plan:
+        {previous_text}
+        """
+
+        client = genai.Client(api_key=settings.GEMINI_API_KEY)
+        response = client.models.generate_content(
+            model="gemini-2.5-flash", contents=prompt
+        )
+
+        text= (
+            response.candidates[0].content.parts[0].text
+            if response.candidates and response.candidates[0].content.parts
+            else "No response from AI."
+        )
+        self.last_llm_response= text
+
+        # Send the new plan back to the client
+        await self.send(text_data= json.dumps({
+            'message': text,
+            'from_llm': True
+        }))
+
     async def send_question(self):
         if self.question_index < len(PREDEFINED_QUESTIONS):
             question = PREDEFINED_QUESTIONS[self.question_index]
