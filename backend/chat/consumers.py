@@ -1,6 +1,7 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from accounts.models import UserProfile
+from diet.models import DailyMeal
 from asgiref.sync import sync_to_async
 from channels.db import database_sync_to_async
 from .models import ChatMessage
@@ -72,8 +73,7 @@ class ChatBot(AsyncWebsocketConsumer):
 
 
         if self.question_index < len(PREDEFINED_QUESTIONS):
-            #await self.send_question()
-            pass
+            await self.send_question()
         else:
             # If all questions are answered, process the answers
 
@@ -164,7 +164,7 @@ class ChatBot(AsyncWebsocketConsumer):
             return
         
         # Saving the diet plan to the database
-        await sync_to_async(DietPlan.objects.create) (
+        await sync_to_async(DailyMeal.objects.create) (
             user= self.scope['user'],
             breakfast=structured_data.get("breakfast"),
             lunch=structured_data.get("lunch"),
@@ -206,14 +206,14 @@ class ChatBot(AsyncWebsocketConsumer):
             'from_llm': True
         }))
 
-    '''async def send_question(self):
+    async def send_question(self):
         if self.question_index < len(PREDEFINED_QUESTIONS):
             question = PREDEFINED_QUESTIONS[self.question_index]
             await self.send(text_data=json.dumps({
                 'message': question
             }))
             self.question_index += 1
-'''
+
 
     async def disconnect(self, close_code):
         pass
