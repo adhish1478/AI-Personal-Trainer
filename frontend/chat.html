@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Personal Trainer Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      justify-content: center;
+      padding: 50px;
+    }
+
+    #chat-container {
+      width: 400px;
+      height: 600px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #chat-box {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .message {
+      margin: 10px 0;
+      padding: 10px 15px;
+      border-radius: 20px;
+      max-width: 70%;
+      clear: both;
+    }
+
+    .user {
+      background: #d1e7dd;
+      align-self: flex-end;
+      margin-left: auto;
+    }
+
+    .server {
+      background: #f8d7da;
+      align-self: flex-start;
+      margin-right: auto;
+    }
+
+    #input-area {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+
+    #user-input {
+      flex: 1;
+      padding: 15px;
+      border: none;
+      border-radius: 0 0 0 10px;
+      outline: none;
+    }
+
+    #send-btn {
+      background: #0d6efd;
+      color: white;
+      border: none;
+      padding: 15px 20px;
+      cursor: pointer;
+      border-radius: 0 0 10px 0;
+    }
+
+    #send-btn:hover {
+      background: #084298;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+<div id="chat-container">
+  <div id="chat-box"></div>
+  <div id="input-area">
+    <input type="text" id="user-input" placeholder="Type your message..." />
+    <button id="send-btn">Send</button>
+  </div>
+</div>
+
+<script>
+  const chatBox = document.getElementById('chat-box');
+  const userInput = document.getElementById('user-input');
+  const sendBtn = document.getElementById('send-btn');
+
+  const token = localStorage.getItem("token");
+  const socket = new WebSocket(`ws://127.0.0.1:8000/ws/chat/?token=${token}`);
+
+  socket.onopen = () => {
+    console.log("✅ WebSocket connected");
+  };
+
+  socket.onmessage = (e) => {
+    const data = JSON.parse(e.data);
+
+    const isMarkdown = data.from_llm === true;  // You can set this from backend
+    addMessage(data.message, 'server', isMarkdown);
+  };
+
+  socket.onclose = () => {
+    addMessage("Connection closed.", 'server');
+  };
+
+  sendBtn.onclick = () => {
+    const message = userInput.value.trim();
+    if (message !== '') {
+      socket.send(JSON.stringify({ message: message }));
+      addMessage(message, 'user');
+      userInput.value = '';
+    }
+  };
+
+  userInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      sendBtn.click();
+    }
+  });
+
+  function addMessage(text, type, isMarkdown = false) {
+    const msg = document.createElement('div');
+    msg.classList.add('message', type);
+    if (isMarkdown) {
+      msg.innerHTML = marked.parse(text);
+    } else {
+      msg.textContent = text;
+    }
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+</script>
+
+</body>
+</html>
