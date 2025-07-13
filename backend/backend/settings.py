@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'corsheaders',  # CORS headers for cross-origin requests
     'channels',  # Django Channels for WebSocket support
     'chat',  # APP for chat functionality
+    'diet',  # APP for diet management
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -77,9 +78,12 @@ SOCIALACCOUNT_PROVIDERS = {
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
+    'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ]
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
 }
 
 # ASGI SETTINGS
@@ -217,3 +221,7 @@ ACCOUNT_LOGIN_METHODS = {'email'}
 
 # Gemini API settings
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'your-gemini-api-key')
+
+'''# USDA API settings -------- NOT IN USE CURRENTLY
+USDA_API_KEY = os.getenv('USDA_API_KEY', 'your-usda-api-key')
+'''

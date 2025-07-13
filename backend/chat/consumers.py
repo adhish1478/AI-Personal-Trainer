@@ -21,7 +21,7 @@ class ChatBot(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
         "message": "Welcome! Ask me anything."
         }))
-        await self.send_question()
+        #await self.send_question()
 
     async def receive(self, text_data):
         # Testing if the user is authenticated- temporary
@@ -51,7 +51,8 @@ class ChatBot(AsyncWebsocketConsumer):
 
 
         if self.question_index < len(PREDEFINED_QUESTIONS):
-            await self.send_question()
+            #await self.send_question()
+            pass
         else:
             # If all questions are answered, process the answers
 
@@ -119,14 +120,14 @@ class ChatBot(AsyncWebsocketConsumer):
 
             
 
-    async def send_question(self):
+    '''async def send_question(self):
         if self.question_index < len(PREDEFINED_QUESTIONS):
             question = PREDEFINED_QUESTIONS[self.question_index]
             await self.send(text_data=json.dumps({
                 'message': question
             }))
             self.question_index += 1
-
+'''
 
     async def disconnect(self, close_code):
         pass
