@@ -7,7 +7,7 @@ export default function Home() {
     console.log(showAuth);
 
     return (
-    <div className="flex flex-col items-center justify-between min-h-screen bg-gradient-to-b from-white to-green-50 text-gray-800 p-6 pt-[130px]">
+    <div className="flex flex-col items-center justify-between min-h-screen bg-gradient-to-b from-white to-green-100 text-gray-800 p-6 pt-[130px]">
 
       {/* Hero Section */}
       <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-5xl mt-16 space-y-8 md:space-y-0">
@@ -23,7 +23,7 @@ export default function Home() {
 
           <button
             onClick={() => setShowAuth(true)}
-            className="flex items-center justify-center bg-green-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-green-700 transition md:self-start cursor-pointer hover:shadow-lg"
+            className="flex items-center justify-center bg-green-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-green-700 transition md:self-start cursor-pointer"
           >
             Get Started
             <ArrowRightIcon className="w-5 h-5 ml-2" />
