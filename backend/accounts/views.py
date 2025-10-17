@@ -21,21 +21,27 @@ class CustomUserViewSet(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
     def post(self, request):
-        print("Entered Register API")
         data= request.data
         if User.objects.filter(email= data.get('email')).exists():
             return Response({"error": "User with this email already exists."}, status=400)
         
         serializer= CustomUserSerializer(data=data)
         if serializer.is_valid():
-            user= serializer.save()
-            # Email verification and token generation can be handled here
-            token= get_email_token(user)
-            transaction.on_commit(lambda: send_welcome_email.delay(user.id, token))
+            user = serializer.save()
+            
+            # Try sending verification email asynchronously, but don’t block response
+            try:
+                token = get_email_token(user)
+                send_welcome_email.delay(user.id, token)  # fire-and-forget
+            except Exception as e:
+                # Log error, don’t fail registration
+                print("Failed to enqueue email task:", e)
+
             return Response({
-                "message": "User created successfully and verification mail sent.",
+                "message": "User created successfully. Verification email will be sent shortly.",
                 "user": user.email
             }, status=201)
+
         return Response(serializer.errors, status=400)
     
     

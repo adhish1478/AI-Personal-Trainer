@@ -4,7 +4,7 @@ from rest_framework import serializers
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model= CustomUser
-        fields= ('id', 'email','password', 'is_active', 'is_staff', 'is_verified', 'created_at')
+        fields= ('id', 'email','password', 'is_active', 'is_staff', 'is_verified', 'created_at', 'first_name','last_name')
         read_only_fields= ('id', 'created_at')
 
     def create(self, validated_data):
