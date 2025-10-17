@@ -2,7 +2,8 @@ from celery import shared_task # type: ignore
 from django.core.mail import send_mail
 from accounts.models import CustomUser
 from django.conf import settings
-from rest_framework_simplejwt.tokens import RefreshToken # type: ignore
+from django.contrib.auth.tokens import default_token_generator
+
 
 @shared_task
 def send_welcome_email(user_id, token):
@@ -17,6 +18,4 @@ def send_welcome_email(user_id, token):
     send_mail(subject, message, from_email, recipients_list)
 
 def get_email_token(user):
-    # This function should generate a token for the user
-    refresh= RefreshToken.for_user(user)
-    return str(refresh.access_token)
+    return default_token_generator.make_token(user)

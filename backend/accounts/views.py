@@ -5,6 +5,7 @@ from rest_framework.generics import RetrieveUpdateAPIView
 from .serializers import CustomUserSerializer, UserProfileSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.authentication import BasicAuthentication
 from django.contrib.auth import get_user_model
 
 from .tasks import send_welcome_email, get_email_token
@@ -17,8 +18,10 @@ class CustomUserViewSet(APIView):
     '''
     ViewSet for CustomUser model
     '''
+    authentication_classes = []
     permission_classes = [AllowAny]
     def post(self, request):
+        print("Entered Register API")
         data= request.data
         if User.objects.filter(email= data.get('email')).exists():
             return Response({"error": "User with this email already exists."}, status=400)
