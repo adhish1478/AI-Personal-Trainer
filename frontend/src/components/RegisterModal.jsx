@@ -1,6 +1,10 @@
 import { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import GoogleAuth from '/src/components/GoogleAuth';
+import axiosInstance from "/src/api/axiosInstance";
+import { REGISTER } from "/src/api/endpoints";
+import toast from "react-hot-toast";
+import LoginModal from "./LoginModal";
 
 
 export default function RegisterModal({ isOpen, onClose, switchToLogin }) {
@@ -8,6 +12,39 @@ export default function RegisterModal({ isOpen, onClose, switchToLogin }) {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const processName= (fullName) => {
+    const [first_name, ...rest] = fullName.trim().split(" ");
+    const last_name= rest.join(" ");
+    return {first_name, last_name};
+  }
+
+  const handleRegister= async () => {
+    const {first_name, last_name}= processName(form.name);
+
+    const payload= {
+      first_name,
+      last_name,
+      email: form.email,
+      password: form.password
+    };
+    
+    try {
+      const response= await axiosInstance.post(REGISTER, payload);
+      console.log("Registration successful:", response.data);
+
+      // Success toast
+      toast.success("Registration successful! Please log in.");
+      onClose();           // close register modal
+      switchToLogin();     // open login modal
+
+    } catch (error) {
+      console.error("Registration failed:", error.response.data);
+
+      // Failure toast
+      toast.error("Registration failed. Try again.");
+    }
   };
 
   return (
@@ -23,7 +60,7 @@ export default function RegisterModal({ isOpen, onClose, switchToLogin }) {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-30" />
+          <div className="fixed inset-0 backdrop-blur-sm" />
         </Transition.Child>
 
         {/* Modal panel */}
@@ -82,7 +119,7 @@ export default function RegisterModal({ isOpen, onClose, switchToLogin }) {
                     </span>
                   </p>
 
-                  <button className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition">
+                  <button onClick={handleRegister} className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition cursor-pointer">
                     Register
                   </button>
 
