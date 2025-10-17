@@ -47,6 +47,7 @@ PyJWT==2.9.0
 pyOpenSSL==25.1.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.1
+redis==5.0.1
 requests==2.32.4
 rest-framework-simplejwt==0.0.2
 rsa==4.9.1
