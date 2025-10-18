@@ -8,10 +8,14 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full bg-white shadow-md z-50 flex justify-between items-center px-6 py-4">
-        <h1 className="text-2xl font-bold text-green-600">NutriAI</h1>
+      <nav className="w-full bg-white shadow-sm fixed top-0 left-0 z-50 p-4 flex justify-center">
+      <div className="w-full max-w-5xl flex justify-between items-center">
+        <section className="flex items-center">
+            <img src="./src/assets/logo.png" alt="Logo" className="w-8 h-8 inline-block mr-2"/>
+            <h1 className="text-xl font-bold text-green-600">Evolve</h1>
+        </section>
 
-        <div className="flex gap-3">
+        <section className="flex items-center gap-4">
           <button
             onClick={() => setLoginOpen(true)}
             className="border border-green-600 text-green-600 px-4 py-2 rounded-md hover:bg-green-50 transition"
@@ -25,6 +29,7 @@ export default function Navbar() {
           >
             Get Started
           </button>
+          </section>
         </div>
       </nav>
 

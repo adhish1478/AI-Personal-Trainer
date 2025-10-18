@@ -1,14 +1,63 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useContext } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import GoogleAuth from '/src/components/GoogleAuth';
+import GoogleAuth from "/src/components/GoogleAuth";
+import axiosInstance from "/src/api/axiosInstance";
+import { LOGIN } from "/src/api/endpoints";
+import { toast } from "react-hot-toast"; // install if not done: npm i react-hot-toast
+import { AuthContext } from "/src/context/AuthContext"; // we'll create this
+import { useNavigate } from 'react-router-dom';
+
 
 export default function LoginModal({ isOpen, onClose, switchToRegister }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { setAuthData } = useContext(AuthContext); // use context to manage login state
+  const navigate = useNavigate();
+
+
+  const handleLogin = async () => {
+    const payload = { email, password };
+
+    try {
+      const response = await axiosInstance.post(LOGIN, payload);
+      const { access, refresh } = response.data;
+      const user = response.data.user;
+
+      // Save tokens to localStorage
+      localStorage.setItem("access_token", access);
+      localStorage.setItem("refresh_token", refresh);
+      localStorage.setItem('user', JSON.stringify(user));
+
+      // Update global auth state
+      setAuthData({ isAuthenticated: true, access, refresh, user });
+      // Update default Axios headers
+      axiosInstance.defaults.headers["Authorization"] = `Bearer ${access}`;
+
+      toast.success("Login successful!");
+    
+
+      // ✅ Decide where to go next
+      if (!user.is_profile_completed) {
+        toast.success("Let's complete your profile!");
+        navigate('/onboarding');
+      } else {
+        toast.success("Welcome back!");
+        navigate('/dashboard');
+      }
+      onClose(); // close modal
+
+
+    } catch (error) {
+      console.error("Login failed:", error.response?.data || error.message);
+      toast.error("Invalid credentials, please try again.");
+      setPassword(""); // clear password field
+    }
+  };
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
+        {/* Overlay */}
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -18,9 +67,10 @@ export default function LoginModal({ isOpen, onClose, switchToRegister }) {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-30" />
+          <div className="fixed inset-0 backdrop-blur-sm" />
         </Transition.Child>
 
+        {/* Modal */}
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4 text-center">
             <Transition.Child
@@ -56,7 +106,10 @@ export default function LoginModal({ isOpen, onClose, switchToRegister }) {
                     className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600"
                   />
 
-                  <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+                  <button
+                    onClick={handleLogin}
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md"
+                  >
                     Login
                   </button>
 
