@@ -1,5 +1,7 @@
 from .models import CustomUser, UserProfile
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -46,3 +48,37 @@ class UserProfileSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        # Get standard token
+        token= super().get_token(user)
+
+        return token
+
+    def validate(self, attrs):
+        data= super().validate(attrs)
+
+        # Add custom claims
+        data['user'] = {
+            "id": self.user.id,
+            "email": self.user.email,
+        }
+
+        try:
+            profile= self.user.profile
+            data['user'].update({
+                "first_name": profile.first_name,
+                "last_name": profile.last_name,
+                "is_profile_completed": profile.is_profile_completed,
+                "is_ready_for_meal_plan": profile.is_ready_for_meal_plan
+            })
+        except Exception:
+            data['user'].update({
+                "first_name": "",
+                "last_name": "",
+                "is_profile_completed": False,
+                "is_ready_for_meal_plan": False
+            })
+        return data

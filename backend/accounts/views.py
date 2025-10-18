@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authentication import BasicAuthentication
 from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import MyTokenObtainPairSerializer
 
 from .tasks import send_welcome_email, get_email_token
 from django.db import transaction
@@ -53,3 +55,6 @@ class UserProfileViewSet(RetrieveUpdateAPIView):
 
     def get_object(self):
         return UserProfile.objects.get(user=self.request.user)
+    
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
