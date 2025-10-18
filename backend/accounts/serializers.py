@@ -20,10 +20,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model= UserProfile
         fields= ['id', 'first_name', 'last_name', 'full_name', 'age', 'gender', 'height',
-            'weight', 'activity_level', 'maintanance_cals', 'goal_cals',
+            'weight', 'activity_level', 'maintenance_cals', 'goal_cals',
             'goal','lifts_weight', 'carbs', 'protein', 'fats', 'fibre', 'allergies', 'cuisine',
             'created_at', 'updated_at']
-        read_only_fields= ['id', 'maintanance_cals', 'created_at', 'updated_at']
+        read_only_fields= ['id', 'maintenance_cals', 'created_at', 'updated_at']
 
     def get_full_name(self, obj):
         return f"{obj.first_name} {obj.last_name}".strip()

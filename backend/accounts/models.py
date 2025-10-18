@@ -61,7 +61,7 @@ class UserProfile(models.Model):
     first_name= models.CharField(max_length=30, blank=True)
     last_name= models.CharField(max_length=30, blank=True)
     age= models.PositiveIntegerField(null=True, blank=True)
-    gender= gender = models.CharField(max_length=10, choices=GENDER_CHOICES, blank=True, null=True)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, blank=True, null=True)
     # Physical attributes
     height= models.FloatField(null=True, blank=True) # in cm
     weight= models.FloatField(null=True, blank=True) # in kg
@@ -70,7 +70,7 @@ class UserProfile(models.Model):
     body_fat= models.FloatField(null=True, blank=True)
     # Goals and calorie targets
     goal= models.CharField(max_length=20, choices=GOAL_CHOICES, default='maintain') # Default to maintain weight
-    maintanance_cals= models.IntegerField(null= True)
+    maintenance_cals= models.IntegerField(null= True)
     goal_cals= models.IntegerField(null=True)
 
     # Macronutrient targets
@@ -85,6 +85,8 @@ class UserProfile(models.Model):
 
     created_at= models.DateField(auto_now_add=True)
     updated_at= models.DateField(auto_now= True)
+    # status
+    is_profile_completed = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.user.email}'s Profile"
@@ -103,7 +105,7 @@ class UserProfile(models.Model):
     }
         return level_map.get(self.activity_level, 1.2) # Default to sedentary if not found
 
-    def calculate_maintanance_calories(self):
+    def calculate_maintenance_calories(self):
         """
         Calculates BMR (Basal Metabolic Rate) using the Mifflin-St Jeor Equation.
         Returns estimated daily maintenance calories assuming sedentary activity.
@@ -128,7 +130,7 @@ class UserProfile(models.Model):
         """
         Calculates goal calories based on the user's goal.
         """
-        if not self.maintanance_cals:
+        if not self.maintenance_cals:
             return None
         
         goal_map= {
@@ -144,7 +146,7 @@ class UserProfile(models.Model):
             'gain_1kg': 1000
         }
         
-        return self.maintanance_cals + goal_map.get(self.goal, 0)
+        return self.maintenance_cals + goal_map.get(self.goal, 0)
     
     def calculate_macros(self):
         """
@@ -201,9 +203,17 @@ class UserProfile(models.Model):
         else:
             self.fibre = 30 if self.goal_cals < 2500 else 35
 
+    def update_profile_completion(self):
+        mandatory = [self.age, self.gender, self.height, self.weight, self.activity_level, self.goal]
+        self.is_profile_completed = all(v is not None and v != "" for v in mandatory)
+    @property
+    def is_ready_for_meal_plan(self):
+        """Convenience property for frontend"""
+        return self.is_profile_completed and self.goal_cals is not None
 
     def save(self, *args, **kwargs):
-        self.maintanance_cals= self.calculate_maintanance_calories()
+        self.maintenance_cals= self.calculate_maintenance_calories()
         self.goal_cals= self.calculate_goal_calories()
         self.calculate_macros()
+        self.update_profile_completion()
         super().save(*args, **kwargs)

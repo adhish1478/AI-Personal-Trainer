@@ -33,12 +33,12 @@ class UserProfileAdmin(admin.ModelAdmin):
         'user_first_name',
         'user_last_name',
         'age',
-        'maintanance_cals',
+        'maintenance_cals',
         'goal_cals'
     )
     search_fields = ('user__first_name', 'user__last_name', 'user__email', 'allergies', 'cuisine')
     list_filter = ('gender', 'activity_level')
-    readonly_fields = ('maintanance_cals', 'goal_cals', 'created_at', 'updated_at')
+    readonly_fields = ('maintenance_cals', 'goal_cals', 'created_at', 'updated_at')
 
     def user_email(self, obj):
         return obj.user.email
