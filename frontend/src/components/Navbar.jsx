@@ -1,10 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import LoginModal from "./LoginModal";
 import RegisterModal from "./RegisterModal";
+import {AuthContext} from "../context/AuthContext";
 
 export default function Navbar() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
+
+  const { isAuthenticated, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
+
 
   return (
     <>
@@ -16,19 +28,30 @@ export default function Navbar() {
         </section>
 
         <section className="flex items-center gap-4">
-          <button
-            onClick={() => setLoginOpen(true)}
-            className="border border-green-600 text-green-600 px-4 py-2 rounded-md hover:bg-green-50 transition"
-          >
-            Login
-          </button>
+            {isAuthenticated ? (
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition"
+              >
+                Logout
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => setLoginOpen(true)}
+                  className="border border-green-600 text-green-600 px-4 py-2 rounded-md hover:bg-green-50 transition"
+                >
+                  Login
+                </button>
 
-          <button
-            onClick={() => setRegisterOpen(true)}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition"
-          >
-            Get Started
-          </button>
+                <button
+                  onClick={() => setRegisterOpen(true)}
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition"
+                >
+                  Get Started
+                </button>
+              </>
+            )}
           </section>
         </div>
       </nav>
