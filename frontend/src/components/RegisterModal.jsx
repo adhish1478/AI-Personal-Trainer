@@ -1,14 +1,18 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useContext } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import GoogleAuth from '/src/components/GoogleAuth';
 import axiosInstance from "/src/api/axiosInstance";
 import { REGISTER } from "/src/api/endpoints";
 import toast from "react-hot-toast";
 import LoginModal from "./LoginModal";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 
 export default function RegisterModal({ isOpen, onClose, switchToLogin }) {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -23,24 +27,52 @@ export default function RegisterModal({ isOpen, onClose, switchToLogin }) {
   const handleRegister= async () => {
     const {first_name, last_name}= processName(form.name);
 
-    const payload= {
+    const payload_name= {
       first_name,
-      last_name,
+      last_name}
+    const registerPayload= {
       email: form.email,
       password: form.password
     };
     
-    try {
-      const response= await axiosInstance.post(REGISTER, payload);
-      console.log("Registration successful:", response.data);
+      try {
+    // 1️⃣ Register user
+    const registerResponse = await axiosInstance.post(REGISTER, registerPayload);
 
-      // Success toast
-      toast.success("Registration successful! Please log in.");
-      onClose();           // close register modal
-      switchToLogin();     // open login modal
+    toast.success("Registration successful! Logging you in...");
+
+    // 2️⃣ Immediately log them in to get tokens
+    const loginResponse = await axiosInstance.post("accounts/token/", {
+      email: form.email,
+      password: form.password
+    });
+
+    const { access, refresh, user } = loginResponse.data;
+
+    login(user, access, refresh);
+    axiosInstance.defaults.headers["Authorization"] = `Bearer ${access}`;
+
+
+    // 3️⃣ Now update the UserProfile
+    await axiosInstance.patch("accounts/api/profile/", {
+      first_name,
+      last_name
+    });
+
+    console.log("Profile details saved!");
+
+    if (!user.is_profile_completed) {
+        navigate('/onboarding');
+        toast.success("Let's complete your profile!");
+      } else {
+        navigate('/dashboard');
+        toast.success("Welcome back!");
+      }
+
+    onClose();
 
     } catch (error) {
-      console.error("Registration failed:", error.response.data);
+      console.error("Registration failed:", error);
 
       // Failure toast
       toast.error("Registration failed. Try again.");
