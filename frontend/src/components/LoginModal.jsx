@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 export default function LoginModal({ isOpen, onClose, switchToRegister }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { setAuthData } = useContext(AuthContext); // use context to manage login state
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
 
@@ -20,16 +20,11 @@ export default function LoginModal({ isOpen, onClose, switchToRegister }) {
 
     try {
       const response = await axiosInstance.post(LOGIN, payload);
-      const { access, refresh } = response.data;
-      const user = response.data.user;
+      const { user, access, refresh } = response.data;
 
       // Save tokens to localStorage
-      localStorage.setItem("access_token", access);
-      localStorage.setItem("refresh_token", refresh);
-      localStorage.setItem('user', JSON.stringify(user));
+      login(user, access, refresh);
 
-      // Update global auth state
-      setAuthData({ isAuthenticated: true, access, refresh, user });
       // Update default Axios headers
       axiosInstance.defaults.headers["Authorization"] = `Bearer ${access}`;
 
