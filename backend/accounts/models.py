@@ -81,7 +81,8 @@ class UserProfile(models.Model):
 
     # Dietary preferences
     allergies= models.JSONField(default=list, blank=True)
-    cuisine= models.CharField(max_length=50, blank=True, null=True)
+    cuisine= models.JSONField(default=list, blank=True)
+    remarks= models.TextField(blank=True, null=True)
 
     created_at= models.DateField(auto_now_add=True)
     updated_at= models.DateField(auto_now= True)

@@ -24,7 +24,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields= ['id', 'first_name', 'last_name', 'full_name', 'age', 'gender', 'height',
             'weight', 'activity_level', 'maintenance_cals', 'goal_cals',
             'goal','lifts_weight', 'carbs', 'protein', 'fats', 'fibre', 'allergies', 'cuisine',
-            'created_at', 'updated_at']
+            'created_at', 'updated_at', 'remarks', 'is_profile_completed']
         read_only_fields= ['id', 'maintenance_cals', 'created_at', 'updated_at']
 
     def get_full_name(self, obj):

@@ -93,7 +93,7 @@ ASGI_APPLICATION = 'backend.asgi.application'
 
 #JWT Authentication settings
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),  # or 1 hour, etc.
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),  # or 1 hour, etc.
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),     # longer lifetime
     'ROTATE_REFRESH_TOKENS': True,                   # Optional: rotates token on refresh
     'BLACKLIST_AFTER_ROTATION': True,                # Optional: blocks old refresh tokens
