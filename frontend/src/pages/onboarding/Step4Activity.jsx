@@ -1,4 +1,4 @@
-export default function StepOne({ formData, setFormData }) {
+export default function Step4Activity({ formData, setFormData }) {
    
   return (
     <div className="flex flex-col gap-4">
