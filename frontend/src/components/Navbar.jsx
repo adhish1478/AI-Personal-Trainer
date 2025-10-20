@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import LoginModal from "./LoginModal";
 import RegisterModal from "./RegisterModal";
 import {AuthContext} from "../context/AuthContext";
+import  axiosInstance  from "../api/axiosInstance";
 
 export default function Navbar() {
   const [loginOpen, setLoginOpen] = useState(false);
@@ -14,6 +15,16 @@ export default function Navbar() {
   const handleLogout = () => {
     logout();
     navigate("/");
+  };
+
+  const handleTestToken = async () => {
+    try {
+      // Make a dummy request to a protected endpoint
+      const response = await axiosInstance.get("accounts/api/profile/");
+      console.log("Test successful:", response.data);
+    } catch (err) {
+      console.error("Test failed:", err);
+    }
   };
 
 
@@ -29,12 +40,20 @@ export default function Navbar() {
 
         <section className="flex items-center gap-4">
             {isAuthenticated ? (
+              <>
               <button
                 onClick={handleLogout}
                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition"
               >
                 Logout
               </button>
+              <button
+              onClick={handleTestToken}
+              className="px-3 py-1 bg-white text-green-600 rounded hover:bg-gray-200"
+            >
+              Test Token Refresh
+            </button>
+            </>
             ) : (
               <>
                 <button
