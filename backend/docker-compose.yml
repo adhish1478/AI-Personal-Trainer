@@ -1,0 +1,33 @@
+
+services:
+  web:
+    build: .
+    command: gunicorn backend.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    restart: always
+    volumes:
+      - .:/app
+      - ./certs:/certs:ro    # mount SSL certs as read-only
+
+  celery:
+    build: .
+    command: celery -A backend worker --loglevel=info
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    restart: always
+    volumes:
+    - .:/app
+    - ./certs:/certs:ro    # <-- mount SSL certs as read-only
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: always

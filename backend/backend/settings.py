@@ -141,11 +141,18 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'FitnessChatbot',
-        'USER': 'postgres',
-        'PASSWORD': '1234',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.getenv('DB_NAME', 'FitnessChatbot'),  # your Cloud SQL DB name
+        'USER': os.getenv('DB_USER', 'postgres'),              # your Cloud SQL user
+        'PASSWORD': os.getenv('DB_PASSWORD', '1234'),        # password for the user
+        'HOST': os.getenv('DB_HOST', 'localhost'),        # Cloud SQL public IP
+        'PORT': os.getenv('DATABASE_PORT', '5432'),               # default Postgres port
+        # SSL settings
+        'OPTIONS': {
+            "sslmode": os.getenv("SSL_MODE"),
+            "sslrootcert": os.getenv("SSL_ROOT_CERT"),
+            "sslcert": os.getenv("SSL_CLIENT_CERT"),
+            "sslkey": os.getenv("SSL_CLIENT_KEY"),
+        },
     }
 }
 
@@ -202,7 +209,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # Celery setup
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = 'redis://redis:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 
