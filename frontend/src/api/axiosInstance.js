@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const baseURL = import.meta.env.VITE_API_BASE || "http://localhost:8000/";
+
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:8000/", // your backend
+  baseURL,
 });
 
 axiosInstance.interceptors.request.use(
@@ -40,7 +42,7 @@ axiosInstance.interceptors.response.use(
       try {
         // Get new access token
         const { data } = await axios.post(
-          "http://localhost:8000/accounts/token/refresh/",
+          `${baseURL.replace(/\/$/, "")}/accounts/token/refresh/`,
           { refresh }
         );
 

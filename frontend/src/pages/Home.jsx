@@ -1,10 +1,15 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import {ArrowRightIcon} from '@heroicons/react/24/solid'
 import heroImage from "../assets/logo2.png";
+import { AuthContext } from "../context/AuthContext";
+import LoginModal from "../components/LoginModal";
+import RegisterModal from "../components/RegisterModal";
 
 export default function Home() {
     const [showAuth, setShowAuth] = useState(false);
-    console.log(showAuth);
+    const [loginOpen, setLoginOpen] = useState(false);
+    const [registerOpen, setRegisterOpen] = useState(false);
+    const { isAuthenticated } = useContext(AuthContext);
 
     return (
     <div className="flex flex-col items-center justify-between min-h-screen bg-gradient-to-b from-white to-green-100 text-gray-800 p-6 pt-[130px]">
@@ -22,7 +27,7 @@ export default function Home() {
           </p>
 
           <button
-            onClick={() => setShowAuth(true)}
+            onClick={() => setLoginOpen(true)}
             className="flex items-center justify-center bg-green-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-green-700 transition md:self-start cursor-pointer"
           >
             Get Started
@@ -44,6 +49,23 @@ export default function Home() {
       <footer className="text-sm text-gray-500 mt-16 mb-6">
         © 2025 AI Nutrition Coach. All rights reserved.
       </footer>
+
+      <LoginModal
+        isOpen={loginOpen && !isAuthenticated}
+        onClose={() => setLoginOpen(false)}
+        switchToRegister={() => {
+          setLoginOpen(false);
+          setRegisterOpen(true);
+        }}
+      />
+      <RegisterModal
+        isOpen={registerOpen && !isAuthenticated}
+        onClose={() => setRegisterOpen(false)}
+        switchToLogin={() => {
+          setRegisterOpen(false);
+          setLoginOpen(true);
+        }}
+      />
     </div>
   );
 }

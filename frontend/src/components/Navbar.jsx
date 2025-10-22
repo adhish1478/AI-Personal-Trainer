@@ -4,6 +4,7 @@ import LoginModal from "./LoginModal";
 import RegisterModal from "./RegisterModal";
 import {AuthContext} from "../context/AuthContext";
 import  axiosInstance  from "../api/axiosInstance";
+import LogoImg from "../assets/Logo.png";
 
 export default function Navbar() {
   const [loginOpen, setLoginOpen] = useState(false);
@@ -34,7 +35,7 @@ export default function Navbar() {
       <nav className="w-full bg-white shadow-sm fixed top-0 left-0 z-50 p-4 flex justify-center">
       <div className="w-full max-w-5xl flex justify-between items-center">
         <section className="flex items-center">
-            <img src="./src/assets/logo.png" alt="Logo" className="w-8 h-8 inline-block mr-2"/>
+            <img src={LogoImg} alt="Logo" className="w-8 h-8 inline-block mr-2"/>
             <h1 className="text-xl font-bold text-green-600">Evolve</h1>
         </section>
 
