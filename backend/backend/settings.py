@@ -38,6 +38,8 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
 ]
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'http')
+
 
 # Application definition
 
@@ -114,6 +116,14 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+]
+
+# CSRF settings
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost',
+    'http://127.0.0.1',
+    'http://34.122.140.209',  # your VM public IP
+    'http://your-domain.com',  # (optional) if you add a domain later
 ]
 
 # CORS settings

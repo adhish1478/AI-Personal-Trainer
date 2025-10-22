@@ -26,7 +26,7 @@ COPY . .
 RUN python manage.py collectstatic --noinput || true
 
 # Expose port
-EXPOSE 8000
+# EXPOSE 8000
 
 # Default command (can be overridden by docker-compose)
 CMD ["gunicorn", "backend.asgi:application", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
